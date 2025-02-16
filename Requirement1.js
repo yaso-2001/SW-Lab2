@@ -32,12 +32,39 @@ function doStuff(a, b) {
             }
         }
     }
-    if (a === "srch") console.log(i.filter(x => [x.n, x.cat, x.prc].some(v => v.toString().toLowerCase().includes(b[0].toLowerCase()))));
-    if (a === "vwI") console.log("=== Inv ===", i);
+    if (a === "srch") console.log(i.filter(x => [x.n, x.cat, x.prc].some(v => v.toString().toLowerCase().includes(b[0].toLowerCase()))).map(x => `${x.n} (${x.cat}) - ${x.qty} ${x.unt} @ $${x.prc}`).join('\n'));
+    if (a === "vwI") console.log("=== Inv ===", i.map(x => `${x.n} (${x.cat}) - ${x.qty} ${x.unt} @ $${x.prc}`).join('\n'));
     if (a === "xprtAll") console.log("CSV:\n" + ["Name,Category,Quantity,Price,Unit,AddedAt"].concat(i.map(x => Object.values(x).join(','))).join('\n'));
-    if (a === "vwAllT") console.log("Transactions:\n", t);
+    if (a === "vwAllT") console.log("Transactions:\n", t.map(x => `${x.type} - ${x.itm.n}`).join('\n'));
     if (a === "vwIAg") console.log(i.map(x => `${x.n}: ${Math.floor((new Date() - new Date(x.added)) / (1000 * 60 * 60 * 24))}d`).join('\n'));
-    if (a === "Imprt") b[0].forEach(x => doStuff("add", [x.n, x.cat, x.quantity, x.price, x.unit]));
+    if (a === "Imprt") b.forEach(x => doStuff("add", [x.n, x.cat, x.quantity, x.price, x.unit]));
     if (a === "addFld" && !f[b[0]]) f[b[0]] = null;
-    if (a === "udCFld") i.find(x => x.n === b[0])?.custF[b[1]] = b[2];
+    if (a === "udCFld") { i.find(x => x.n === b[0]).custF[b[1]] = b[2]; }
 }
+
+
+function main() {
+    console.log("Running inventory tests...");
+
+    doStuff("add", ["Apple", "Fruit", 10, 1.5, "kg"]);
+    doStuff("add", ["Banana", "Fruit", 5, 1, "kg"]);
+    doStuff("add", ["Orange", "Fruit", 3, 2, "kg"]);
+    doStuff("add", ["Milk", "Dairy", 5, 3, "litre"]);
+
+    doStuff("Sale", ["Apple", 2]);
+    doStuff("rstck", ["Milk", 2]);
+
+    doStuff("srch", ["mil"]);
+    doStuff("vwI");
+    doStuff("vwIAg");
+
+    doStuff("xprtAll");
+    doStuff("vwAllT");
+
+    doStuff("Imprt", [{ n: "Pineapple", cat: "Fruit", quantity: 5, price: 3, unit: "kg" }]);
+
+    doStuff("addFld", ["Origin"]);
+    doStuff("udCFld", ["Apple", "Origin", "India"]);
+}
+
+main();
